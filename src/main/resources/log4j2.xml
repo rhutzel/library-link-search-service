@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+    <Appenders>
+        <Console name="ConsoleAppender" target="SYSTEM_OUT">
+            <!-- JsonLayout complete="true" compact="true" eventEol="true" / -->
+            <PatternLayout pattern="%-5p [%t]: %m%n" />
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Logger name="org.hibernate" level="info" additivity="false">
+            <AppenderRef ref="ConsoleAppender" />
+        </Logger>
+        <Logger name="org.springframework" level="info" additivity="false">
+            <AppenderRef ref="ConsoleAppender" />
+        </Logger>
+        <Logger name="org.synchronoss" level="info" additivity="false">
+            <AppenderRef ref="ConsoleAppender" />
+        </Logger>
+        <Logger name="io.netty" level="info" additivity="false">
+            <AppenderRef ref="ConsoleAppender" />
+        </Logger>
+        <Logger name="reactor" level="info" additivity="false">
+            <AppenderRef ref="ConsoleAppender" />
+        </Logger>
+        <Root level="DEBUG">
+            <AppenderRef ref="ConsoleAppender" />
+        </Root>
+    </Loggers>
+</Configuration>
