@@ -1,9 +1,9 @@
 package com.rhutzel.librarylink.server.entity;
 
-// import org.springframework.data.annotation.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.time.LocalDate;
-import java.util.List;
+import java.util.Objects;
 
 public class Requisition {
 
@@ -12,14 +12,16 @@ public class Requisition {
     public String positionType;
     public LocalDate postedDate;
     public String title;
-    public String description;
-    public List<String> keywords;
+    public String descriptionHtml;
+    @JsonIgnore
+    public String descriptionLowerCaseText;
 
-    public Requisition(String id, LocalDate postedDate, String title, String description) {
+    public Requisition(String id, LocalDate postedDate, String title, String descriptionHtml, String descriptionLowerCaseText) {
         this.id = id;
         this.postedDate = postedDate;
         this.title = title;
-        this.description = description;
+        this.descriptionHtml = descriptionHtml;
+        this.descriptionLowerCaseText = descriptionLowerCaseText;
     }
 
     public String getId() {
@@ -54,20 +56,41 @@ public class Requisition {
         this.title = title;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescriptionHtml() {
+        return descriptionHtml;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescriptionHtml(String descriptionHtml) {
+        this.descriptionHtml = descriptionHtml;
     }
 
-    public List<String> getKeywords() {
-        return keywords;
+    public String getDescriptionLowerCaseText() {
+        return descriptionLowerCaseText;
     }
 
-    public void setKeywords(List<String> keywords) {
-        this.keywords = keywords;
+    public void setDescriptionText(String descriptionLowerCaseText) {
+        this.descriptionLowerCaseText = descriptionLowerCaseText;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Requisition that = (Requisition) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Requisition{" +
+                "id='" + id + '\'' +
+                ", postedDate=" + postedDate +
+                ", title='" + title + '\'' +
+                '}';
+    }
 }
