@@ -1,30 +1,49 @@
 package com.rhutzel.librarylink.server.service;
 
 import com.rhutzel.librarylink.server.entity.Requisition;
+import com.rhutzel.librarylink.server.repository.RequisitionRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 @Service
 public class CacheService {
     private Logger logger = LogManager.getLogger(CacheService.class);
-
     private CopyOnWriteArrayList<Requisition> cache = new CopyOnWriteArrayList<>();
 
+    @Autowired
+    RequisitionRepository requisitionRepository;
+
+    @PostConstruct
+    private void init() {
+        fillCacheFromPersistence();
+    }
+
     public void fillCacheFromPersistence() {
+        logger.info("Filling cache from persistence...");
         cache.clear();
+        requisitionRepository.findAll().collectList().subscribe(requisitions -> {
+            cache.addAll(requisitions);
+            logger.info(String.format("Cache contains [%d] requisitions.", cache.size()));
+        });
     }
 
     public void fillCache(List<Requisition> requisitions) {
         logger.info(String.format("Filling cache with [%d] requisitions...", requisitions.size()));
-        cache.addAll(requisitions);
+        this.cache.addAll(requisitions);
+        persistCache();
     }
 
     public void persistCache() {
+        requisitionRepository.insertAll(Flux.fromIterable(this.cache))
+                .doOnComplete(() -> logger.info("Finished persisting cache."))
+                .subscribe();
     }
 
     public Flux<Requisition> retrieveCache(Optional<String> includeCsv, Optional<String> excludeCsv) {

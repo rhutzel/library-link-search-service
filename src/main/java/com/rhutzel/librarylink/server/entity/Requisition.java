@@ -1,13 +1,16 @@
 package com.rhutzel.librarylink.server.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
 import java.util.Objects;
 
+@Document
 public class Requisition {
 
-    // @Id
+    @Id
     public String id;
     public String positionType;
     public LocalDate postedDate;
