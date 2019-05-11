@@ -1,6 +1,5 @@
-package com.rhutzel.librarylink.server;
+package com.rhutzel.librarylink.server.service;
 
-import com.rhutzel.librarylink.server.service.IngestService;
 import org.junit.Test;
 import org.springframework.util.StreamUtils;
 import reactor.test.StepVerifier;
@@ -23,10 +22,12 @@ public class IngestServiceTest {
         StepVerifier.create(service.extractRequisitionsFromHtml(testHtml))
                 .expectNextMatches(requisitions -> requisitions.size() == 2
                         && requisitions.get(0).getTitle().equals("Test Title 1")
-                        && requisitions.get(0).getDescription().equals("Test Body 1")
+                        && requisitions.get(0).getDescriptionHtml().equals("Test Body 1")
+                        && requisitions.get(0).getDescriptionLowerCaseText().equals("test body 1")
                         && requisitions.get(0).getPostedDate().equals(LocalDate.of(2001, Month.JANUARY, 1))
                         && requisitions.get(1).getTitle().equals("Test Title 2")
-                        && requisitions.get(1).getDescription().equals("Test Body 2")
+                        && requisitions.get(1).getDescriptionHtml().equals("Test Body 2")
+                        && requisitions.get(1).getDescriptionLowerCaseText().equals("test body 2")
                         && requisitions.get(1).getPostedDate().equals(LocalDate.of(2002, Month.FEBRUARY, 2))
                 ).verifyComplete();
     }
