@@ -40,7 +40,7 @@ public class IngestService {
     private CacheService cacheService;
 
     public Mono<Void> ingest() {
-        Flux.range(0, 2)
+        Flux.range(0, 1000)
                 .delayElements(Duration.ofSeconds(2))
                 .concatMap(pageNumber -> useMocking.toLowerCase().equals("true")
                         ? retrieveMockedPage(pageNumber)

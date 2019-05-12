@@ -36,14 +36,15 @@ public class CacheService {
 
     public void fillCache(List<Requisition> requisitions) {
         logger.info(String.format("Filling cache with [%d] requisitions...", requisitions.size()));
+        this.cache.clear();
         this.cache.addAll(requisitions);
         persistCache();
     }
 
     public void persistCache() {
-        requisitionRepository.insertAll(Flux.fromIterable(this.cache))
-                .doOnComplete(() -> logger.info("Finished persisting cache."))
-                .subscribe();
+        requisitionRepository.deleteAll()
+                .thenMany(requisitionRepository.insertAll(Flux.fromIterable(this.cache)))
+                .doOnComplete(() -> logger.info("Finished persisting cache.")).subscribe();
     }
 
     public Flux<Requisition> retrieveCache(Optional<String> includeCsv, Optional<String> excludeCsv) {
@@ -63,5 +64,29 @@ public class CacheService {
                             || requisition.getDescriptionLowerCaseText().contains(include))
             );
         });
+    }
+
+    public boolean filterPositionType(Requisition requisition, Optional<String> fullTime, Optional<String> partTime) {
+        if (requisition.getPositionType() == null) {
+            return true;
+        }
+
+        if (fullTime.isPresent()) {
+            if (fullTime.get().equals("true") && requisition.getPositionType().equals("Part-Time")) {
+                return false;
+            }
+            if (!fullTime.get().equals("true") && requisition.getPositionType().equals("Full-Time")) {
+                return false;
+            }
+        }
+        if (partTime.isPresent()) {
+            if (partTime.get().equals("true") && requisition.getPositionType().equals("Full-Time")) {
+                return false;
+            }
+            if (!partTime.get().equals("true") && requisition.getPositionType().equals("Part-Time")) {
+                return false;
+            }
+        }
+        return true;
     }
 }

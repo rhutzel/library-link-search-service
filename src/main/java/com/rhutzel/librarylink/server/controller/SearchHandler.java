@@ -17,12 +17,10 @@ public class SearchHandler {
 
     public Mono<ServerResponse> search(ServerRequest request) {
         return ServerResponse.ok()
-                // .contentType(MediaType.APPLICATION_STREAM_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(cacheService.retrieveCache(
-                        request.queryParam("includes"),
-                        request.queryParam("excludes")
-                ), Requisition.class);
+                .contentType(MediaType.APPLICATION_JSON).body(
+                        cacheService.retrieveCache(request.queryParam("includes"), request.queryParam("excludes"))
+                        .filter(requisition -> cacheService.filterPositionType(requisition, request.queryParam("fullTime"), request.queryParam("partTime"))),
+                Requisition.class);
     }
 
 }

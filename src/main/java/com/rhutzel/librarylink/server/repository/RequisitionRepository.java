@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Service
 public class RequisitionRepository {
@@ -20,10 +21,13 @@ public class RequisitionRepository {
     }
 
     public Flux<Requisition> insertAll(Flux<Requisition> requisitions) {
-        return Flux.mergeSequential(
-            requisitions.buffer(10)
-                    .doOnNext(chunk -> logger.info(String.format("Inserting %d record(s)...", chunk.size())))
-                    .map(chunk -> template.insertAll(chunk)));
+        return requisitions.buffer(10)
+                .doOnNext(chunk -> logger.info(String.format("Inserting %d record(s)...", chunk.size())))
+                .flatMap(chunk -> template.insertAll(chunk));
+    }
+
+    public Mono<Void> deleteAll() {
+        return template.dropCollection(Requisition.class);
     }
 
 }
