@@ -11,6 +11,7 @@ import reactor.core.publisher.Flux;
 import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Collectors;
 
 @Service
 public class CacheService {
@@ -48,10 +49,8 @@ public class CacheService {
     }
 
     public Flux<Requisition> retrieveCache(Optional<String> includeCsv, Optional<String> excludeCsv) {
-        List<String> includes = includeCsv.isPresent() && includeCsv.get().length() > 0
-                ? Arrays.asList(includeCsv.get().toLowerCase().split(",")) : Collections.emptyList();
-        List<String> excludes = excludeCsv.isPresent() && excludeCsv.get().length() > 0
-                ? Arrays.asList(excludeCsv.get().toLowerCase().split(",")) : Collections.emptyList();
+        List<String> includes = convertCsvToFilterTerms(includeCsv);
+        List<String> excludes = convertCsvToFilterTerms(excludeCsv);
 
         return Flux.fromIterable(this.cache).filter(requisition -> {
             if (excludes.size() > 0 && excludes.stream().anyMatch(exclude ->
@@ -64,6 +63,15 @@ public class CacheService {
                             || requisition.getDescriptionLowerCaseText().contains(include))
             );
         });
+    }
+
+    public List<String> convertCsvToFilterTerms(Optional<String> csv) {
+        if (!csv.isPresent() || csv.get().isEmpty()) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(csv.get().split(","))
+                .map(term -> term.toLowerCase().trim())
+                .collect(Collectors.toList());
     }
 
     public boolean filterPositionType(Requisition requisition, Optional<String> fullTime, Optional<String> partTime) {

@@ -4,7 +4,9 @@ import com.rhutzel.librarylink.server.entity.Requisition;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -17,7 +19,7 @@ public class RequisitionRepository {
     ReactiveMongoTemplate template;
 
     public Flux<Requisition> findAll() {
-        return template.findAll(Requisition.class);
+        return template.find(new Query().with(new Sort(Sort.Direction.ASC, "postedDate")), Requisition.class);
     }
 
     public Flux<Requisition> insertAll(Flux<Requisition> requisitions) {
