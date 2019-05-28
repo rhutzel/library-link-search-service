@@ -19,7 +19,7 @@ public class RequisitionRepository {
     ReactiveMongoTemplate template;
 
     public Flux<Requisition> findAll() {
-        return template.find(new Query().with(new Sort(Sort.Direction.ASC, "postedDate")), Requisition.class);
+        return template.find(new Query().with(new Sort(Sort.Direction.DESC, "postedDate")), Requisition.class);
     }
 
     public Flux<Requisition> insertAll(Flux<Requisition> requisitions) {
