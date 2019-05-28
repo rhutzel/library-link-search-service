@@ -9,6 +9,9 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
 @Component
 public class SearchHandler {
 
@@ -16,10 +19,15 @@ public class SearchHandler {
     CacheService cacheService;
 
     public Mono<ServerResponse> search(ServerRequest request) {
+        LocalDate sixMonthsAgo = LocalDate.now().minus(6, ChronoUnit.MONTHS);
+
         return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON).body(
                         cacheService.retrieveCache(request.queryParam("includes"), request.queryParam("excludes"))
-                        .filter(requisition -> cacheService.filterPositionType(requisition, request.queryParam("fullTime"), request.queryParam("partTime"))),
+                                .filter(requisition -> requisition.getPostedDate().isAfter(sixMonthsAgo))
+                                .filter(requisition -> cacheService.filterPositionType(
+                                        requisition, request.queryParam("fullTime"),
+                                        request.queryParam("partTime"))),
                 Requisition.class);
     }
 

@@ -123,9 +123,10 @@ public class IngestService {
     }
 
     Requisition annotateRequisition(Requisition requisition) {
-        String[] partTimeIndicators = new String[] { "p/t" , "part-time" };
+        String[] partTimeIndicators = new String[] { "p/t", "part-time" };
         String[] fullTimeIndicators = new String[] { "f/t" , "full-time" };
         String title = requisition.getTitle().toLowerCase();
+        String[] titleTokens = title.split("[ ,]");
         String description = requisition.getDescriptionLowerCaseText();
 
         if (title.startsWith("ft ") || Arrays.stream(fullTimeIndicators)
@@ -134,6 +135,10 @@ public class IngestService {
         }
 
         if (Arrays.stream(partTimeIndicators).anyMatch(indicator -> title.contains(indicator) || description.contains(indicator))) {
+            requisition.setPositionType("Part-Time");
+        }
+
+        if (Arrays.stream(titleTokens).anyMatch(token -> token.equals("intern"))) {
             requisition.setPositionType("Part-Time");
         }
 

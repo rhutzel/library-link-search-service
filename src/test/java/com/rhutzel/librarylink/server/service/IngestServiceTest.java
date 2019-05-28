@@ -1,5 +1,7 @@
 package com.rhutzel.librarylink.server.service;
 
+import com.rhutzel.librarylink.server.entity.Requisition;
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.util.StreamUtils;
 import reactor.test.StepVerifier;
@@ -30,6 +32,24 @@ public class IngestServiceTest {
                         && requisitions.get(1).getDescriptionLowerCaseText().equals("test body 2")
                         && requisitions.get(1).getPostedDate().equals(LocalDate.of(2002, Month.FEBRUARY, 2))
                 ).verifyComplete();
+    }
+
+    @Test
+    public void testCategorizesInternInTitleAsPartTime() {
+        Requisition testRequisition1 = new Requisition("1", LocalDate.now(), "Summer Intern Program", "", "");
+        Requisition testRequisition2 = new Requisition("1", LocalDate.now(), "Summer Internet Program", "", "");
+        Requisition testRequisition3 = new Requisition("1", LocalDate.now(), "Summer Intern,Program", "", "");
+        Requisition testRequisition4 = new Requisition("1", LocalDate.now(), "Full-time Summer Intern Program", "", "");
+
+        service.annotateRequisition(testRequisition1);
+        service.annotateRequisition(testRequisition2);
+        service.annotateRequisition(testRequisition3);
+        service.annotateRequisition(testRequisition4);
+
+        Assert.assertEquals("Part-Time", testRequisition1.getPositionType());
+        Assert.assertNull(testRequisition2.getPositionType());
+        Assert.assertEquals("Part-Time", testRequisition3.getPositionType());
+        Assert.assertEquals("Part-Time", testRequisition4.getPositionType());
     }
 
 }
